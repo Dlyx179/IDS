@@ -1,7 +1,7 @@
 # CSCI262 Assignment 3 Grp T02-12
 import numpy as np
 import sys
-from typing import List, Tuple, Dict
+from typing import List, Tuple
 
 def read_file(filename: str) -> List[List[str]]:
     try:
