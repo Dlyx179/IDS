@@ -15,7 +15,7 @@ def validate_events(events: List[List[str]], stats: List[List[str]]) -> None:
     if len(events) != len(stats) or events[0][0] != stats[0][0]:
         print("Inconsistent number or order of events.")
         sys.exit(0)
-    for i, (event, stat) in enumerate(zip(events[1:], stats[1:]), start=1):
+    for event, stat in zip(events[1:], stats[1:]):
         if event[0] != stat[0]:
             print("Inconsistent order of events.")
             sys.exit(0)
