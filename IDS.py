@@ -3,6 +3,7 @@ import numpy as np
 import sys
 from typing import List, Tuple
 
+# Storing Events and Stats
 def read_file(filename: str) -> List[List[str]]:
     try:
         with open(filename, 'r') as f:
@@ -11,6 +12,7 @@ def read_file(filename: str) -> List[List[str]]:
         print(f"File not found: {filename}")
         sys.exit(0)
 
+# Detect potential inconsistencies
 def validate_events(events: List[List[str]], stats: List[List[str]]) -> None:
     if len(events) != len(stats) or events[0][0] != stats[0][0]:
         print("Inconsistent number or order of events.")
@@ -20,7 +22,9 @@ def validate_events(events: List[List[str]], stats: List[List[str]]) -> None:
             print(f"Inconsistent order of events at line {i + 1}.")
             sys.exit(0)
 
+# Activity Engine
 def generate_baseline_events(events: List[List[str]], stats: List[List[str]], days: int) -> List[List[str]]:
+    print(f"Generating baseline events for {days} days...")
     baseline_events = []
     for _ in range(days):
         daily_events = []
@@ -33,22 +37,30 @@ def generate_baseline_events(events: List[List[str]], stats: List[List[str]], da
             else:
                 daily_events.append(f"{generated:.2f}")
         baseline_events.append(daily_events)
+    print(f"Complete!")
     return baseline_events
 
+# Logging baseline events
 def write_events_to_file(filename: str, baseline_events: List[List[str]], events: List[List[str]]) -> None:
+    print(f"Logging baseline events to {filename}...")
     with open(filename, 'w') as f:
         for day, daily_events in enumerate(baseline_events, start=1):
             f.write(f"Day {day}\n")
             for i, event in enumerate(daily_events):
                 f.write(f"{events[i+1][0]} : {event}\n")
             f.write("\n")
+    print(f"Complete!")
 
+# Analysis Engine
 def calculate_statistics(baseline_events: List[List[str]]) -> Tuple[np.ndarray, np.ndarray]:
+    print("Calculating statistics (mean and standard deviation)...")
     numeric_events = np.array(baseline_events, dtype=float)
     means = numeric_events.mean(axis=0)
     std_devs = numeric_events.std(axis=0)
+    print(f"Complete!")
     return means, std_devs
 
+# Logging stats
 def write_statistics(filename: str, means: np.ndarray, std_devs: np.ndarray, events: List[List[str]]) -> None:
     with open(filename, 'w') as f:
         for i, (mean, sd) in enumerate(zip(means, std_devs)):
@@ -58,6 +70,7 @@ def write_statistics(filename: str, means: np.ndarray, std_devs: np.ndarray, eve
                 f.write(f"{events[i+1][0]}:{mean:.2f}:{sd:.2f}\n")
 
 def anomaly_report(days: int, baseline_events: List[List[str]], events: List[List[str]], baseline_stats: List[List[str]]) -> None:
+    print(f"Generating anomaly report for {days} days...")
     with open("Anomaly_Report.txt", 'w') as f:
         for day, daily_events in enumerate(baseline_events, start=1):
             anomaly_counter = 0.0
@@ -75,6 +88,8 @@ def anomaly_report(days: int, baseline_events: List[List[str]], events: List[Lis
             f.write(f"Threshold: {threshold}\n")
             f.write("Anomaly detected.\n" if anomaly_counter >= threshold else "No anomaly detected.\n")
             f.write("\n")
+    print("Anomaly report generated!")
+    print("Stored into Anomaly_Report.txt.")
 
 def main():
     if len(sys.argv) < 4:
@@ -105,7 +120,8 @@ def main():
     # Load baseline stats for anomaly reporting
     baseline_stats = read_file("Baseline_Stats.txt")
     anomaly_report(days, baseline_events, events, baseline_stats)
-    
+
+    # Alert Engine
     while True:
         choice = input("Enter 'c' to continue with a new file or 'q' to quit: ").strip().lower()
         if choice == 'q':
