@@ -31,11 +31,11 @@ def generate_baseline_events(events: List[List[str]], stats: List[List[str]], da
         for i in range(1, len(events)):
             mean = float(stats[i][1])
             sd = float(stats[i][2])
-            generated = np.random.normal(mean, sd)
+            generated_event = np.random.normal(mean, sd)
             if events[i][1] == "D":
-                daily_events.append(str(int(round(generated))))
+                daily_events.append(str(int(round(generated_event))))
             else:
-                daily_events.append(f"{generated:.2f}")
+                daily_events.append(f"{generated_event:.2f}")
         baseline_events.append(daily_events)
     print(f"Complete!")
     return baseline_events
@@ -88,8 +88,7 @@ def anomaly_report(days: int, baseline_events: List[List[str]], events: List[Lis
             f.write(f"Threshold: {threshold}\n")
             f.write("Anomaly detected.\n" if anomaly_counter >= threshold else "No anomaly detected.\n")
             f.write("\n")
-    print("Anomaly report generated!")
-    print("Stored into Anomaly_Report.txt.")
+    print("Complete! Stored into Anomaly_Report.txt")
 
 def main():
     if len(sys.argv) < 4:
