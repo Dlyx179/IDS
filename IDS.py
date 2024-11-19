@@ -58,7 +58,7 @@ def read_stats_file(filename):
 def check_inconsistencies(events, stats):
     # check if number of events and stats match
     if (len(events) != len(stats)) or (events.get('num') != stats.get('num')):
-        print("Inconsistent number of events.")
+        print("Error: Inconsistent number of events.")
         sys.exit(0)
 
     # check if order of items matches
@@ -71,12 +71,17 @@ def check_inconsistencies(events, stats):
         print("Error: Order or names of events and stats do not match.")
         sys.exit(0)
 
-    # check for and integer/float inconsistencies in standard deviation
+    # check whether mean in range and integer/float inconsistencies in standard deviation
     for event_name, stat_data in stats.items():
         if event_name == 'num':
             continue
         
+        mean = stat_data["mean"]
         std_dev = stat_data["std_dev"]
+
+        if events[event_name]["min"] > mean or events[event_name]["max"] < mean:
+            print(f"Error: Event '{event_name}' has a mean out of range.")
+            sys.exit(0)
 
         if events[event_name]["type"] == "D" and not std_dev.is_integer():
             print(f"Warning: Discrete event '{event_name}' has a non-integer standard deviation.")
@@ -185,7 +190,7 @@ def save_and_display(filename, data):
 
 def main():
     if len(sys.argv) < 4:
-        print("Usage: IDS Events.tx Stats.txt <Days>")
+        print("Usage: IDS Events.txt Stats.txt <Days>")
         return
         
     # input
@@ -256,7 +261,7 @@ def main():
 
             # go through process of setup, data generate
             new_stats = read_stats_file(new_stats_file)
-            # check_inconsistencies(events, new_stats)
+            check_inconsistencies(events, new_stats)
             new_events = generate_events(events, new_stats, new_days)
             save_and_display("anomaly_logs.json", new_events)
             input("Anomaly detection activity data generation completed. Press Enter to proceed to the next step...")
